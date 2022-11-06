@@ -1,0 +1,15 @@
+apiVersion: route.openshift.io/v1	
+kind: Route	
+metadata:	
+  name: argocd	
+  namespace: argocd
+  annotations:
+    cert-manager.io/issuer-name: letsencrypt
+    cert-manager.io/issuer-kind: ClusterIssuer
+spec:	
+  host: argocd.apps.k8s.leber.com.de	
+  port:	
+    targetPort: http
+  to:	
+    kind: Service
+    name: argocd-server	
