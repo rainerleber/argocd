@@ -17,18 +17,18 @@ spec:
   - namespace: '*'
     server: '*'
 
----
-apiVersion: argoproj.io/v1alpha1
-kind: AppProject
-metadata:
-  name: aks-project
-  namespace: argocd
-spec:
-  sourceRepos:
-  - '*'
-  destinations:
-  - namespace: '*'
-    server: 'https://k8s-e02eb21e.hcp.northeurope.azmk8s.io:443'
-  clusterResourceWhitelist:
-  - group: '*'
-    kind: '*'
+# ---
+# apiVersion: argoproj.io/v1alpha1
+# kind: AppProject
+# metadata:
+#   name: aks-project
+#   namespace: argocd
+# spec:
+#   sourceRepos:
+#   - '*'
+#   destinations:
+#   - namespace: '*'
+#     server: 'https://k8s-e02eb21e.hcp.northeurope.azmk8s.io:443'
+#   clusterResourceWhitelist:
+#   - group: '*'
+#     kind: '*'

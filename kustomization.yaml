@@ -3,7 +3,7 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
 resources:
-  - https://raw.githubusercontent.com/argoproj/argo-cd/v2.5.0/manifests/install.yaml
+  - https://raw.githubusercontent.com/argoproj/argo-cd/v2.5.5/manifests/install.yaml
   - ingress.yaml
   - namespace.yaml
   - project.yaml
@@ -36,10 +36,10 @@ secretGenerator:
   - name: argocd-vault-plugin-credentials
     literals:
       - AVP_AUTH_TYPE=approle
-      - AVP_ROLE_ID=281c0440-2f5c-1912-79f4-af32367cdb11
-      - AVP_SECRET_ID=3ac0dbfd-3869-9999-4c6c-17b6e45de30d
+      - AVP_ROLE_ID=0ff15838-f746-ba90-069b-a214d39d99c3
+      - AVP_SECRET_ID=5e065704-531b-0b3d-d00f-26f7525d69e0
       - AVP_TYPE=vault
-      - VAULT_ADDR=https://vault.apps.k8s.leber.com.de
+      - VAULT_ADDR=http://vault.apps.k8s.leber.com.de
 
 
 generatorOptions:
@@ -53,11 +53,12 @@ patches:
         name: github-tools-https-creds
         labels:
           argocd.argoproj.io/secret-type: repo-creds
-  - target:
-      kind: ServiceAccount
-      name: argocd-dex-server
-    patch: |-
-      - op: add
-        path: /metadata/annotations/serviceaccounts.openshift.io~1oauth-redirecturi.argocd
-        value:
-          https://argocd.apps.k8s.leber.com.de/api/dex/callback
+
+  # - target:
+  #     kind: ServiceAccount
+  #     name: argocd-dex-server
+  #   patch: |-
+  #     - op: add
+  #       path: /metadata/annotations/serviceaccounts.openshift.io~1oauth-redirecturi.argocd
+  #       value:
+  #         https://argocd.apps.k8s.leber.com.de/api/dex/callback

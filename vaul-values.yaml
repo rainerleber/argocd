@@ -1,0 +1,58 @@
+global:
+  openshift: false
+server:
+  ingress:
+    annotations:
+      cert-manager.io/issuer-kind: ClusterIssuer
+      cert-manager.io/issuer-name: letsencrypt
+    enabled: true
+    activeService: true
+    ingressClassName: cilium
+    hosts: 
+      - host: vault.apps.k8s.leber.com.de
+  dataStorage:
+    enabled: true
+    size: 10Gi
+    storageClass: nfs-csi
+    accessMode: ReadWriteOnce
+  image:
+    pullPolicy: IfNotPresent
+    repository: hashicorp/vault-enterprise
+    tag: latest
+  enterpriseLicense:
+    secretKey: lic
+    secretName: vault-license
+  ha:
+    apiAddr: null
+    disruptionBudget:
+      enabled: true
+      maxUnavailable: null
+    enabled: true
+    raft:
+      config: |
+        ui = true
+        listener "tcp" {
+          tls_disable = 1
+          address = "[::]:8200"
+          cluster_address = "[::]:8201"
+        }
+        seal "azurekeyvault" {
+        tenant_id      = "0c3ab0af-b330-4c19-b793-290e4f456337"
+        client_id      = "19fab81f-bd42-4c40-b9af-c44fb6def8bc"
+        client_secret  = "M.ao9V2lxdEIb-Uf~1vQ2q6nWEV40~13Oo"
+        vault_name     = "kv-hashivault-neu"
+        key_name       = "hashivault"
+        }
+        storage "raft" {
+          path = "/vault/data"
+          retry_join {
+            leader_api_addr = "http://vault-0.vault-internal.vault.svc.cluster.local:8200"
+          }
+          retry_join {
+            leader_api_addr = "http://vault-1.vault-internal.vault.svc.cluster.local:8200"
+          }
+        }
+        service_registration "kubernetes" {}
+      enabled: true
+      setNodeId: true
+    replicas: 2
