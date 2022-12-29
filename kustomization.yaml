@@ -39,7 +39,7 @@ secretGenerator:
       - AVP_ROLE_ID=0ff15838-f746-ba90-069b-a214d39d99c3
       - AVP_SECRET_ID=5e065704-531b-0b3d-d00f-26f7525d69e0
       - AVP_TYPE=vault
-      - VAULT_ADDR=http://vault.apps.k8s.leber.com.de
+      - VAULT_ADDR=https://vault.apps.k8s.leber.com.de
 
 
 generatorOptions:
