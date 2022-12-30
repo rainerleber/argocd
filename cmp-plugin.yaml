@@ -66,5 +66,8 @@ data:
             - "find . -name '*.yaml' | xargs -I {} grep \"<path\\|avp\\.kubernetes\\.io\" {} | grep . || find . -name '*.yml' | xargs -I {} grep \"<path\\|avp\\.kubernetes\\.io\" {} | grep ."
       generate:
         command:
-          - argocd-vault-plugin generate . || true
+          - bash
+          - "-c"
+          - |
+            argocd-vault-plugin generate . || for f in *; do (cat "${f}"; echo -e '\n---'); done
       lockRepo: false
