@@ -3,7 +3,7 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
 resources:
-  - https://raw.githubusercontent.com/argoproj/argo-cd/v2.5.5/manifests/install.yaml
+  - https://raw.githubusercontent.com/argoproj/argo-cd/v2.5.5/manifests/ha/install.yaml
   - ingress.yaml
   - namespace.yaml
   - project.yaml
@@ -62,3 +62,55 @@ patches:
   #       path: /metadata/annotations/serviceaccounts.openshift.io~1oauth-redirecturi.argocd
   #       value:
   #         https://argocd.apps.k8s.leber.com.de/api/dex/callback
+
+## must be adjusted if new version
+  - target:
+      kind: Deployment
+      name: argocd-repo-server
+    patch: |-
+      - op: replace
+        path: /spec/template/spec/initContainers/0/env/0/value
+        value: "1.13.0"
+
+  - target:
+      kind: Deployment
+      name: argocd-repo-server
+    patch: |-
+      - op: replace
+        path: /spec/template/spec/containers/0/image
+        value: "quay.io/argoproj/argocd:v2.5.5"
+      - op: replace
+        path: /spec/template/spec/containers/1/image
+        value: "quay.io/argoproj/argocd:v2.5.5"
+      - op: replace
+        path: /spec/template/spec/containers/2/image
+        value: "quay.io/argoproj/argocd:v2.5.5"
+
+  - patch: |-
+      apiVersion: v1
+      kind: Secret
+      metadata:
+        name: github-tools-https-creds
+        labels:
+          argocd.argoproj.io/secret-type: repo-creds
+
+  # this patch will delete the network policy 'argocd-redis-ha-server-network-policy'
+  # this patch must be reviewed from time to time
+  # at the moment the policy will prevent creating redis servers
+  - patch: |-
+      $patch: delete
+      apiVersion: networking.k8s.io/v1
+      kind: NetworkPolicy
+      metadata:
+        name: argocd-redis-ha-server-network-policy
+      spec: ''
+  # this patch will delete the network policy 'argocd-redis-ha-proxy-network-policy'
+  # this patch must be reviewed from time to time
+  # at the moment the policy will prevent creating redis servers
+  - patch: |-
+      $patch: delete
+      apiVersion: networking.k8s.io/v1
+      kind: NetworkPolicy
+      metadata:
+        name: argocd-redis-ha-proxy-network-policy
+      spec: ''

@@ -25,7 +25,7 @@ data:
         command:
           - sh
           - "-c"
-          - "kustomize build . | argocd-vault-plugin generate -"
+          - "kustomize build . | argocd-vault-plugin generate - || kustomize build ."
       lockRepo: false
   avp-helm.yaml: |
     ---
@@ -49,7 +49,7 @@ data:
           - "-c"
           - |
             helm template $ARGOCD_APP_NAME -n $ARGOCD_APP_NAMESPACE -f <(echo "$ARGOCD_ENV_HELM_VALUES") . |
-            argocd-vault-plugin generate -
+            argocd-vault-plugin generate - || helm template $ARGOCD_APP_NAME -n $ARGOCD_APP_NAMESPACE -f <(echo "$ARGOCD_ENV_HELM_VALUES") .
       lockRepo: false
   avp.yaml: |
     apiVersion: argoproj.io/v1alpha1
@@ -66,7 +66,5 @@ data:
             - "find . -name '*.yaml' | xargs -I {} grep \"<path\\|avp\\.kubernetes\\.io\" {} | grep . || find . -name '*.yml' | xargs -I {} grep \"<path\\|avp\\.kubernetes\\.io\" {} | grep ."
       generate:
         command:
-          - argocd-vault-plugin
-          - generate
-          - "."
+          - argocd-vault-plugin generate . || true
       lockRepo: false
