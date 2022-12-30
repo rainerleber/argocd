@@ -12,3 +12,5 @@ spec:
             - --insecure
             - --staticassets
             - /shared/app
+            - --redis
+            - argocd-redis-ha-haproxy:6379
