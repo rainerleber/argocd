@@ -54,6 +54,14 @@ patches:
         labels:
           argocd.argoproj.io/secret-type: repo-creds
 
+  - target:
+      kind: Role
+      name: argocd-server
+    patch: |-
+      - op: add
+        path: /rules/0/resources/-
+        value: pods/exec
+
   # - target:
   #     kind: ServiceAccount
   #     name: argocd-dex-server
