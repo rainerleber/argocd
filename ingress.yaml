@@ -6,6 +6,7 @@ metadata:
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt
     io.cilium/websocket: enabled
+    ingress.cilium.io/service-type: "LoadBalancer"
 spec:
   ingressClassName: cilium
   rules:
@@ -19,4 +20,7 @@ spec:
                   number: 80
             path: /
             pathType: Prefix
-
+  tls:
+  - hosts:
+    - argocd.apps.k8s.leber.com.de
+    secretName: argocd-cert
