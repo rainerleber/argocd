@@ -4,7 +4,7 @@ metadata:
   name: argocd-cm
 data:
   admin.enabled: "true"
-  exec.enabled: "true"
+  exec.enabled: "false"
   url: "http://argocd.apps.k8s.leber.com.de"
   resource.exclusions: |
     - apiGroups:

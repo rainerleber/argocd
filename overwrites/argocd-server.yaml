@@ -7,10 +7,6 @@ spec:
     spec:
       containers:
         - name: argocd-server
-          command:
-            - argocd-server
+          args:
+            - /usr/local/bin/argocd-server
             - --insecure
-            - --staticassets
-            - /shared/app
-            - --redis
-            - argocd-redis-ha-haproxy:6379
