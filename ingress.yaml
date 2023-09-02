@@ -10,7 +10,7 @@ metadata:
 spec:
   ingressClassName: cilium
   rules:
-    - host: "argocd.apps.k8s.leber.com.de"
+    - host: "argocd.seed.apps.k8s.leber.io"
       http:
         paths:
           - backend:
@@ -22,5 +22,5 @@ spec:
             pathType: Prefix
   tls:
   - hosts:
-    - argocd.apps.k8s.leber.com.de
+    - argocd.apps.k8s.leber.io
     secretName: argocd-cert

@@ -10,7 +10,7 @@ spec:
     namespace: argocd
   project: central-argocd
   source:
-    path: definitions
+    path: definitions/cluster-manager
     repoURL: 'https://github.com/rainerleber/argocd-apps.git'
     targetRevision: main
   syncPolicy:
