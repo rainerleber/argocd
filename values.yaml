@@ -37,6 +37,9 @@ argo-cd:
         command: [/var/run/argocd/argocd-cmp-server]
         # renovate: ds=docker repository=quay.io/argoproj/argocd
         image: quay.io/argoproj/argocd:v2.8.6
+        securityContext:
+          runAsNonRoot: false
+          runAsUser: 0
         volumeMounts:
           - mountPath: /var/run/argocd
             name: var-files
@@ -66,6 +69,9 @@ argo-cd:
         command: [/var/run/argocd/argocd-cmp-server]
         # renovate: ds=docker repository=quay.io/argoproj/argocd
         image: quay.io/argoproj/argocd:v2.8.6
+        securityContext:
+          runAsNonRoot: false
+          runAsUser: 0
         volumeMounts:
           - mountPath: /var/run/argocd
             name: var-files
@@ -93,6 +99,9 @@ argo-cd:
         command: [/var/run/argocd/argocd-cmp-server]
         # renovate: ds=docker repository=quay.io/argoproj/argocd
         image: quay.io/argoproj/argocd:v2.8.6
+        securityContext:
+          runAsNonRoot: false
+          runAsUser: 0
         volumeMounts:
           - mountPath: /var/run/argocd
             name: var-files
