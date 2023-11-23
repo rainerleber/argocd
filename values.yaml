@@ -12,13 +12,9 @@ argo-cd:
       app.kubernetes.io/name: argocd-redis
 
     enabled: true
-    image:
-      tag: 7.2.2-alpine
     haproxy:
       labels:
         app.kubernetes.io/name: argocd-redis-ha-haproxy
-      image:
-        tag: lts
 
   controller:
     metrics:
@@ -40,7 +36,7 @@ argo-cd:
       - name: avp-helm
         command: [/var/run/argocd/argocd-cmp-server]
         # renovate: ds=docker repository=quay.io/argoproj/argocd
-        image: 410493064257.dkr.ecr.eu-central-1.amazonaws.com/argocd:v2.8.6
+        image: argocd:v2.8.6
         securityContext:
           runAsNonRoot: true
           runAsUser: 999
@@ -72,7 +68,7 @@ argo-cd:
       - name: avp-kustomize
         command: [/var/run/argocd/argocd-cmp-server]
         # renovate: ds=docker repository=quay.io/argoproj/argocd
-        image: 410493064257.dkr.ecr.eu-central-1.amazonaws.com/argocd:v2.8.6
+        image: argocd:v2.8.6
         securityContext:
           runAsNonRoot: true
           runAsUser: 999
@@ -102,7 +98,7 @@ argo-cd:
       - name: avp
         command: [/var/run/argocd/argocd-cmp-server]
         # renovate: ds=docker repository=quay.io/argoproj/argocd
-        image: 410493064257.dkr.ecr.eu-central-1.amazonaws.com/argocd:v2.8.6
+        image: argocd:v2.8.6
         securityContext:
           runAsNonRoot: true
           runAsUser: 999
