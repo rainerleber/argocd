@@ -32,7 +32,6 @@ spec:
             selector:
               matchLabels:
                 argocd.argoproj.io/secret-type: cluster
-                admincluster: "true"
   goTemplate: true
   template:
     metadata:
@@ -42,7 +41,7 @@ spec:
       sources:
       - path: '.'
         repoURL: https://github.com/rainerleber/argocd
-        targetRevision: '{{`{{if eq (index .metadata.labels "stage") "dev"}}dev{{else}}main{{ end }}`}}'
+        targetRevision: main
         helm:
           valueFiles:
             - values.yaml

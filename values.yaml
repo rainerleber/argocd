@@ -1,5 +1,4 @@
 hostname: oc
-overtake: "false"
 argo-cd:
   global:
     additionalLabels:
