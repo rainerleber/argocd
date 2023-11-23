@@ -1,0 +1,10 @@
+apiVersion: v2
+name: argocd
+description: A Helm chart for my-chart
+type: application
+# renovate: name=argo-cd repository=https://argoproj.github.io/argo-helm
+version: 5.51.1
+dependencies:
+- name: argo-cd
+  version: "5.51.1"
+  repository: "https://argoproj.github.io/argo-helm"

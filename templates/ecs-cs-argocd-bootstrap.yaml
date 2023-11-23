@@ -1,0 +1,80 @@
+---
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: central-argocd
+  labels:
+    app.kubernetes.io/part-of: argocd
+spec:
+  description: Central ArgoCD
+  # Allow manifests to deploy from any Git repos
+  sourceRepos:
+  - '*'
+  clusterResourceWhitelist:
+  - group: '*'
+    kind: '*'
+  destinations:
+  - namespace: '*'
+    server: '*'
+
+# ArogCD Selfmanaged Takeover
+---
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: appset-argocd
+spec:
+  generators:
+    # matrix 'parent' generator
+    - matrix:
+        generators:
+        - clusters:
+            selector:
+              matchLabels:
+                argocd.argoproj.io/secret-type: cluster
+                admincluster: "true"
+  goTemplate: true
+  template:
+    metadata:
+      name: argocd
+    spec:
+      project: "central-argocd"
+      sources:
+      - path: '.'
+        repoURL: https://github.com/rainerleber/argocd
+        targetRevision: '{{`{{if eq (index .metadata.labels "stage") "dev"}}dev{{else}}main{{ end }}`}}'
+        helm:
+          valueFiles:
+            - values.yaml
+          valuesObject:
+            hostname: '{{`{{ .name }}`}}'
+            overtake: "true"
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: 'argocd'
+      syncPolicy:
+        syncOptions:
+          - CreateNamespace=false
+        automated: {}
+---
+kind: Application
+apiVersion: argoproj.io/v1alpha1
+metadata:
+  name: tools
+  finalizers:
+  - resources-finalizer.argocd.argoproj.io
+spec:
+  destination:
+    server: 'https://kubernetes.default.svc'
+    namespace: argocd
+  project: central-argocd
+  source:
+    path: definitions/cluster-manager
+    repoURL: 'https://github.com/rainerleber/argocd-apps.git'
+    targetRevision: main
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true
+    automated:
+      allowEmpty: true
+      selfHeal: true

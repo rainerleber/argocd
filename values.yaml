@@ -1,0 +1,254 @@
+hostname: oc
+overtake: "false"
+argo-cd:
+  global:
+    additionalLabels:
+      argocd.argoproj.io/instance: argocd
+    image:
+      # renovate: ds=docker repository=quay.io/argoproj/argocd
+      tag: "v2.8.6"
+  
+  redis-ha:
+    labels:
+      app.kubernetes.io/name: argocd-redis
+
+    enabled: true
+    image:
+      tag: 7.2.2-alpine
+    haproxy:
+      labels:
+        app.kubernetes.io/name: argocd-redis-ha-haproxy
+      image:
+        tag: lts
+
+  controller:
+    metrics:
+      enabled: false
+      service:
+        annotations:
+          "prometheus.io/scrape": "true"
+          "prometheus.io/port": "8082"
+
+  server:
+    autoscaling:
+      enabled: true
+
+  repoServer:
+    autoscaling:
+      minReplicas: 1
+
+    extraContainers:
+      - name: avp-helm
+        command: [/var/run/argocd/argocd-cmp-server]
+        # renovate: ds=docker repository=quay.io/argoproj/argocd
+        image: 410493064257.dkr.ecr.eu-central-1.amazonaws.com/argocd:v2.8.6
+        securityContext:
+          runAsNonRoot: true
+          runAsUser: 999
+        volumeMounts:
+          - mountPath: /var/run/argocd
+            name: var-files
+          - mountPath: /home/argocd/cmp-server/plugins
+            name: plugins
+          - mountPath: /tmp
+            name: tmp
+
+          # Register plugins into sidecar
+          - mountPath: /home/argocd/cmp-server/config/plugin.yaml
+            subPath: avp-helm.yaml
+            name: cmp-plugin
+
+          # Important: Mount tools into $PATH
+          - name: custom-tools
+            subPath: argocd-vault-plugin
+            mountPath: /usr/local/bin/argocd-vault-plugin
+          - name: custom-tools
+            subPath: kubectl
+            mountPath: /usr/local/bin/kubectl
+        envFrom:
+          - secretRef:
+              name: argocd-vault-plugin-credentials
+
+      # argocd-vault-plugin with Kustomize
+      - name: avp-kustomize
+        command: [/var/run/argocd/argocd-cmp-server]
+        # renovate: ds=docker repository=quay.io/argoproj/argocd
+        image: 410493064257.dkr.ecr.eu-central-1.amazonaws.com/argocd:v2.8.6
+        securityContext:
+          runAsNonRoot: true
+          runAsUser: 999
+        volumeMounts:
+          - mountPath: /var/run/argocd
+            name: var-files
+          - mountPath: /home/argocd/cmp-server/plugins
+            name: plugins
+          - mountPath: /tmp
+            name: tmp
+
+          # Register plugins into sidecar
+          - mountPath: /home/argocd/cmp-server/config/plugin.yaml
+            subPath: avp-kustomize.yaml
+            name: cmp-plugin
+
+          # Important: Mount tools into $PATH
+          - name: custom-tools
+            subPath: argocd-vault-plugin
+            mountPath: /usr/local/bin/argocd-vault-plugin
+
+        envFrom:
+          - secretRef:
+              name: argocd-vault-plugin-credentials
+
+      # argocd-vault-plugin with plain YAML
+      - name: avp
+        command: [/var/run/argocd/argocd-cmp-server]
+        # renovate: ds=docker repository=quay.io/argoproj/argocd
+        image: 410493064257.dkr.ecr.eu-central-1.amazonaws.com/argocd:v2.8.6
+        securityContext:
+          runAsNonRoot: true
+          runAsUser: 999
+        volumeMounts:
+          - mountPath: /var/run/argocd
+            name: var-files
+          - mountPath: /home/argocd/cmp-server/plugins
+            name: plugins
+          - mountPath: /tmp
+            name: tmp
+
+          # Register plugins into sidecar
+          - mountPath: /home/argocd/cmp-server/config/plugin.yaml
+            subPath: avp.yaml
+            name: cmp-plugin
+
+          # Important: Mount tools into $PATH
+          - name: custom-tools
+            subPath: argocd-vault-plugin
+            mountPath: /usr/local/bin/argocd-vault-plugin
+
+        envFrom:
+          - secretRef:
+              name: argocd-vault-plugin-credentials
+            
+    podAnnotations:
+      kubectl.kubernetes.io/default-container: avp-helm
+    volumes:
+      - configMap:
+          name: cmp-plugin
+        name: cmp-plugin
+      - name: custom-tools
+        emptyDir: {}
+    initContainers:
+      - name: download-tools
+        image: registry.access.redhat.com/ubi8@sha256:c94bc309b197f9fc465052123ead92bf50799ba72055bd040477ded452d87a0d
+        env:
+          - name: AVP_VERSION
+            # renovate: ds=git-tags repository=https://github.com/argoproj-labs/argocd-vault-plugin
+            value: 1.16.1
+        command: [sh, -c]
+        args:
+          - >-
+            curl -L https://github.com/argoproj-labs/argocd-vault-plugin/releases/download/v$(AVP_VERSION)/argocd-vault-plugin_$(AVP_VERSION)_linux_amd64 -o argocd-vault-plugin &&
+            chmod +x argocd-vault-plugin &&
+            mv argocd-vault-plugin /custom-tools/ &&
+            curl -LO https://dl.k8s.io/release/$(curl -LS https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl &&
+            chmod +x ./kubectl &&
+            mv kubectl /custom-tools/
+
+        volumeMounts:
+          - mountPath: /custom-tools
+            name: custom-tools
+
+  configs:
+    cm:
+      create: true
+      admin.enabled: "true"
+      exec.enabled: "false"
+      application.resourceTrackingMethod: annotation
+      application.instanceLabelKey: argocd.argoproj.io/instance
+      resource.customizations.useOpenLibs.argoproj.io_Application: "true"
+      # see https://argo-cd.readthedocs.io/en/stable/operator-manual/health/#argocd-app
+      resource.customizations.health.argoproj.io_Application: | 
+        hs = {}
+        hs.status = "Progressing"
+        hs.message = ""
+        if obj.status ~= nil then
+          local status = obj.status
+          if status.conditions ~= nil then
+            for i, condition in ipairs(status.conditions) do
+              if condition.type ~= nil and string.match(condition.type, '.*Error$') then
+                hs.status = "Degraded"
+                hs.message = condition.message
+                return hs
+              end
+            end
+          end
+          if status.health ~= nil then
+            local health = status.health
+            hs.status = health.status
+            if health.message ~= nil then
+              hs.message = health.message
+            end
+            local syncStatus = (status.sync and status.sync.status or nil)
+            if hs.status == "Healthy" and syncStatus ~= "Synced" then
+              hs.status = "Progressing"
+            end
+          end
+        end
+        return hs
+    rbac:
+      "policy.csv": |
+        p, role:operator, applications, *, */*, allow
+        g, "change-me", role:operator
+    params:
+      "controller.sharding.algorithm": round-robin
+      "controller.resource.health.persist": "false"
+    cmp:
+      create: true
+      plugins: 
+        avp-kustomize:
+          allowConcurrency: true
+          discover:
+            find:
+              command:
+                - find
+                - "."
+                - -name
+                - kustomization.yaml
+          generate:
+            command:
+              - sh
+              - "-c"
+              - "kustomize build . | argocd-vault-plugin generate -"
+          lockRepo: false
+        avp-helm:
+          allowConcurrency: true
+          # Note: this command is run _before_ any Helm templating is done, therefore the logic is to check
+          # if this looks like a Helm chart
+          discover:
+            find:
+              command:
+                - sh
+                - "-c"
+                - "find . -name 'Chart.yaml'"
+          generate:
+            command:
+              - bash
+              - "-c"
+              - |
+                helm template $ARGOCD_APP_NAME -n $ARGOCD_APP_NAMESPACE -f <(echo "$ARGOCD_ENV_HELM_VALUES") . --include-crds |
+                argocd-vault-plugin generate - || helm template $ARGOCD_APP_NAME -n $ARGOCD_APP_NAMESPACE -f <(echo "$ARGOCD_ENV_HELM_VALUES") . --include-crds
+          lockRepo: false
+        avp:
+          allowConcurrency: true
+          discover:
+            find:
+              command:
+                - sh
+                - "-c"
+                - "find . -type f -name '*.yaml' ! -name '*_wf_*' -or -name '*.yml' ! -name '*_wf_*' | xargs -I {} grep \"<path\\|avp\\.kubernetes\\.io\" {} | grep ."
+          generate:
+            command:
+              - argocd-vault-plugin
+              - generate
+              - "."
+          lockRepo: false

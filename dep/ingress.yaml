@@ -10,7 +10,7 @@ metadata:
 spec:
   ingressClassName: cilium
   rules:
-    - host: "argocd.seed.apps.k8s.leber.io"
+    - host: "argocd.apps.k8s.leber.io"
       http:
         paths:
           - backend:

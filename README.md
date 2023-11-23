@@ -1,32 +1,68 @@
-# argocd
+# Helm chart template
 
-## Preface
+Helm chart template project
 
-**Important**: Initially, this repository only contains configuration for the ecs-cs ArgoCD.
+## Bootstrap
 
-## Preparation
+### Prerequisites
 
-### Install kustomize
-
-There are two ways to use kustomize:
-
-1. Install natively: <https://kubectl.docs.kubernetes.io/installation/kustomize/>
-2. Use with `kubectl`: <https://kubernetes.io/docs/tasks/manage-kubernetes-objects/kustomization/>
-
-## Deployment
-
-### Deploy the ECS-CS ArgoCD
+set alias for kubectl
 
 ```bash
-kustomize build . > zz_generated_manifests.yaml
-kubectl -n argocd apply -f zz_generated_manifests.yaml
+alias k=kubectl
 ```
 
-### Get initial admin credentials
+download and install argocd-vault-plugin on your local machine
 
-Get the initial admin password:
+<https://github.com/argoproj-labs/argocd-vault-plugin>
+
+Adapt the secrets below and export the variables for the vault plugin.
 
 ```bash
-kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d
+export AWS_REGION=eu-central-1
+export AWS_ACCESS_KEY_ID="AKIAV7E2LCRATIHUYNWG"
+export AWS_SECRET_ACCESS_KEY=changeme
+export AVP_TYPE=awssecretsmanager
+
 ```
 
+create the namespace
+
+```bash
+k create ns ecs-cs-argocd
+```
+
+create ecr pull secret
+
+```bash
+k create secret docker-registry ecr-registry --docker-server=https://<account>.dkr.ecr.<region>.amazonaws.com --docker-username=AWS --docker-password=$(aws ecr get-login-password --region <region>) -n ecs-cs-argocd
+```
+
+### Generate values.yaml
+
+duplicate the template values-template.yaml
+
+```bash
+cp values-template.yaml values-\<name-of-the-cluster\>.yaml
+```
+
+replace the values in the new file by using sed or search and replace in your editor
+because over the complete file there are sveral entries to be replaced
+
+```yaml
+hostname: clustername-where-argocd-is-deployed
+managedProjects: ["gardener-projects-to-be-managed-by-argocd"]
+adminClusterProject: projectname-where-argocd-cluster-is-deployed
+stage: the-stage-of-the-deployment-devprod
+
+awsRegion: aws-region
+awsAccount: aws-account-id
+```
+
+### Apply
+
+To apply the namespace must be declared twice because of the plugin.
+
+```bash
+helm template argocd . -f values-xxx.yaml -n ecs-cs-argocd | argocd-vault-plugin generate - | k apply  -n ecs-cs-argocd -f - 
+```
