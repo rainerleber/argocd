@@ -27,6 +27,11 @@ argo-cd:
   server:
     autoscaling:
       enabled: true
+    route:
+      # -- Enable an OpenShift Route for the Argo CD server
+      enabled: true
+      # -- Hostname of OpenShift Route
+      hostname: "argocd.apps.oc.leber.io"
 
   repoServer:
     autoscaling:
