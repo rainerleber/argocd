@@ -32,6 +32,9 @@ argo-cd:
       enabled: true
       # -- Hostname of OpenShift Route
       hostname: "argocd.apps.oc.leber.io"
+      annotations:
+        cert-manager.io/issuer-kind: ClusterIssuer
+        cert-manager.io/issuer-name: letsencrypt
 
   repoServer:
     autoscaling:
