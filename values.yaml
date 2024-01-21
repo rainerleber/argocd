@@ -27,6 +27,12 @@ argo-cd:
   server:
     certificate:
       enabled: true
+      secretName: argocd-tls-secret
+      issuer:
+        kind: ClusterIssuer
+        name: letsencrypt
+        group: cert-manager.io
+      domain: argocd.apps.oc.leber.io
     autoscaling:
       enabled: true
     route:
