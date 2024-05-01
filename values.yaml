@@ -5,7 +5,7 @@ argo-cd:
       argocd.argoproj.io/instance: argocd
     image:
       # renovate: ds=docker repository=quay.io/argoproj/argocd
-      tag: "v2.8.6"
+      tag: "v2.10.9"
   
   redis-ha:
     labels:
@@ -53,7 +53,7 @@ argo-cd:
       - name: avp-helm
         command: [/var/run/argocd/argocd-cmp-server]
         # renovate: ds=docker repository=quay.io/argoproj/argocd
-        image: quay.io/argoproj/argocd:v2.8.6
+        image: quay.io/argoproj/argocd:v2.10.9
         securityContext:
           runAsNonRoot: false
           runAsUser: 0
@@ -85,7 +85,7 @@ argo-cd:
       - name: avp-kustomize
         command: [/var/run/argocd/argocd-cmp-server]
         # renovate: ds=docker repository=quay.io/argoproj/argocd
-        image: quay.io/argoproj/argocd:v2.8.6
+        image: quay.io/argoproj/argocd:v2.10.9
         securityContext:
           runAsNonRoot: false
           runAsUser: 0
@@ -115,7 +115,7 @@ argo-cd:
       - name: avp
         command: [/var/run/argocd/argocd-cmp-server]
         # renovate: ds=docker repository=quay.io/argoproj/argocd
-        image: quay.io/argoproj/argocd:v2.8.6
+        image: quay.io/argoproj/argocd:v2.10.9
         securityContext:
           runAsNonRoot: false
           runAsUser: 0
