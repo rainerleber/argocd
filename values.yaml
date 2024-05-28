@@ -156,6 +156,9 @@ argo-cd:
           - name: AVP_VERSION
             # renovate: ds=git-tags repository=https://github.com/argoproj-labs/argocd-vault-plugin
             value: 1.16.1
+        securityContext:
+          runAsNonRoot: false
+          runAsUser: 0
         command: [sh, -c]
         args:
           - >-
