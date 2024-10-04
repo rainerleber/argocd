@@ -5,7 +5,7 @@ argo-cd:
       argocd.argoproj.io/instance: argocd
     image:
       # renovate: ds=docker repository=quay.io/argoproj/argocd
-      tag: "v2.10.9"
+      tag: "v2.12.4"
   
   redis-ha:
     enabled: true
@@ -20,23 +20,13 @@ argo-cd:
 
   server:
     certificate:
-      enabled: true
+      enabled: false
       secretName: argocd-tls-secret
-      issuer:
-        kind: ClusterIssuer
-        name: letsencrypt
-        group: cert-manager.io
-      domain: argocd.apps.oc.leber.io
     autoscaling:
       enabled: true
     route:
       # -- Enable an OpenShift Route for the Argo CD server
-      enabled: true
-      # -- Hostname of OpenShift Route
-      hostname: "argocd.apps.oc.leber.io"
-      annotations:
-        cert-manager.io/issuer-kind: ClusterIssuer
-        cert-manager.io/issuer-name: letsencrypt
+      enabled: false
       
 
   repoServer:
