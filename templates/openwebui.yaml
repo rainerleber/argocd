@@ -1,0 +1,39 @@
+---
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: appset-openwebui
+spec:
+  generators:
+    - clusters:
+        selector:
+          matchLabels:
+            argocd.argoproj.io/secret-type: cluster
+  goTemplate: true
+  template:
+    metadata:
+      name: openwebui
+    spec:
+      project: "central-argocd"
+      sources:
+      - path: '.'
+        repoURL: https://helm.openwebui.com/
+        targetRevision: 3.3.0
+        chart: open-webui
+        helm:
+          valuesObject:
+            ollama:
+              gpu:
+                enabled: true
+                type: 'nvidia'
+                number: 1
+              models:
+                - llama3
+            runtimeClassName: nvidia
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: 'openwebui'
+      syncPolicy:
+        syncOptions:
+          - CreateNamespace=true
+        automated: {}

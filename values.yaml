@@ -9,6 +9,7 @@ argo-cd:
   
   redis-ha:
     enabled: true
+    auth: false
 
   controller:
     metrics:
