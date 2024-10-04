@@ -1,4 +1,5 @@
 hostname: cncs
+overtake: "false"
 argo-cd:
   global:
     additionalLabels:
