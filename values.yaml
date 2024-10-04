@@ -1,4 +1,4 @@
-hostname: oc
+hostname: cncs
 argo-cd:
   global:
     additionalLabels:
@@ -8,13 +8,7 @@ argo-cd:
       tag: "v2.10.9"
   
   redis-ha:
-    labels:
-      app.kubernetes.io/name: argocd-redis
-
     enabled: true
-    haproxy:
-      labels:
-        app.kubernetes.io/name: argocd-redis-ha-haproxy
 
   controller:
     metrics:
