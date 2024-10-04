@@ -18,17 +18,20 @@ spec:
       sources:
       - path: '.'
         repoURL: https://helm.openwebui.com/
-        targetRevision: 0.3.30
+        targetRevision: 3.3.0
         chart: open-webui
         helm:
           valuesObject:
             ollama:
-              gpu:
-                enabled: true
-                type: 'nvidia'
-                number: 1
-              models:
-                - llama3
+              autoscaling:
+                minReplicas: 2
+              ollama:
+                gpu:
+                  enabled: true
+                  type: 'nvidia'
+                  number: 1
+                models:
+                  - llama3
             runtimeClassName: nvidia
       destination:
         server: https://kubernetes.default.svc
