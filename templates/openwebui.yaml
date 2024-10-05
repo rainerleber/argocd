@@ -23,6 +23,13 @@ spec:
         helm:
           valuesObject:
             ollama:
+              ingress:
+                enabled: true
+                hosts:
+                - host: ollama.sva.dev
+                  paths:
+                    - path: /
+                      pathType: Prefix
               autoscaling:
                 minReplicas: 2
               ollama:
@@ -33,6 +40,13 @@ spec:
                 models:
                   - llama3
             runtimeClassName: nvidia
+            ingress:
+              enabled: true
+              hosts:
+              - host: ollama.sva.dev
+                paths:
+                  - path: /
+                    pathType: Prefix
       destination:
         server: https://kubernetes.default.svc
         namespace: 'openwebui'
