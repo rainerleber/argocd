@@ -8,7 +8,7 @@ spec:
     - clusters:
         selector:
           matchLabels:
-            argocd.argoproj.io/secret-type: cluster
+            argocd.argoproj.io/secret-type: cluster-none
   goTemplate: true
   template:
     metadata:
