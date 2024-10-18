@@ -39,7 +39,7 @@ argo-cd:
       - name: avp-helm
         command: [/var/run/argocd/argocd-cmp-server]
         # renovate: ds=docker repository=quay.io/argoproj/argocd
-        image: quay.io/argoproj/argocd:v2.12.4
+        image: quay.io/argoproj/argocd:v2.12.6
         securityContext:
           runAsNonRoot: false
           runAsUser: 0
@@ -71,7 +71,7 @@ argo-cd:
       - name: avp-kustomize
         command: [/var/run/argocd/argocd-cmp-server]
         # renovate: ds=docker repository=quay.io/argoproj/argocd
-        image: quay.io/argoproj/argocd:v2.12.4
+        image: quay.io/argoproj/argocd:v2.12.6
         securityContext:
           runAsNonRoot: false
           runAsUser: 0
@@ -101,7 +101,7 @@ argo-cd:
       - name: avp
         command: [/var/run/argocd/argocd-cmp-server]
         # renovate: ds=docker repository=quay.io/argoproj/argocd
-        image: quay.io/argoproj/argocd:v2.12.4
+        image: quay.io/argoproj/argocd:v2.12.6
         securityContext:
           runAsNonRoot: false
           runAsUser: 0
