@@ -137,7 +137,7 @@ argo-cd:
         emptyDir: {}
     initContainers:
       - name: download-tools
-        image: registry.access.redhat.com/ubi8@sha256:c94bc309b197f9fc465052123ead92bf50799ba72055bd040477ded452d87a0d
+        image: registry.access.redhat.com/ubi8@sha256:ed721ca811f29fa0fd8a4666aec2fb6771f3defbecc708a973d0b711d6f09293
         env:
           - name: AVP_VERSION
             # renovate: ds=git-tags repository=https://github.com/argoproj-labs/argocd-vault-plugin
